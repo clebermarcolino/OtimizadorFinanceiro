@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PL Solver — ENADE 2021 · Sistemas de Informação</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0b0f1a;
+    --surface:   #141929;
+    --surface2:  #1c2438;
+    --border:    #253050;
+    --accent:    #3b82f6;
+    --accent2:   #06b6d4;
+    --gold:      #f59e0b;
+    --green:     #10b981;
+    --red:       #ef4444;
+    --text:      #e2e8f0;
+    --muted:     #64748b;
+    --mono:      'JetBrains Mono', monospace;
+    --sans:      'Space Grotesk', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .hero {
+    padding: 72px 24px 48px;
+    max-width: 960px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    background: rgba(6,182,212,.1);
+    border: 1px solid rgba(6,182,212,.25);
+    border-radius: 4px;
+    padding: 4px 12px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    background: linear-gradient(135deg, #e2e8f0 30%, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 580px;
+    margin: 0 auto;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px 80px; }
+  .section { margin-bottom: 48px; }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .section h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .card + .card { margin-top: 16px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:600px){ .grid-2 { grid-template-columns: 1fr; } }
+
+  .model-block {
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    font-family: var(--mono);
+    font-size: 14px;
+  }
+  .model-block .label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .model-block .eq { color: var(--text); }
+  .model-block .eq span.hl { color: var(--accent2); }
+  .model-block .eq span.gold { color: var(--gold); }
+  .model-block .eq span.green { color: var(--green); }
+
+  .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .data-table th {
+    background: var(--surface2);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(255,255,255,.02); }
+  .chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .chip-blue { background: rgba(59,130,246,.15); color: var(--accent); }
+  .chip-cyan { background: rgba(6,182,212,.15); color: var(--accent2); }
+
+  #chart-wrap {
+    position: relative;
+    background: var(--surface2);
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 1;
+  }
+  #plCanvas { display: block; width: 100%; height: 100%; }
+
+  #solverBtn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: .01em;
+    transition: opacity .2s, transform .15s;
+    margin-top: 8px;
+  }
+  #solverBtn:hover { opacity: .9; transform: translateY(-1px); }
+  #solverBtn:active { transform: translateY(0); }
+
+  #result { display: none; margin-top: 24px; }
+  .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media(max-width:500px){ .result-grid { grid-template-columns: 1fr 1fr; } }
+  .result-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .result-card .rval {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--green);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .result-card .rlabel {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .result-card.gold-card .rval { color: var(--gold); }
+
+  .steps {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+  .steps .step-title { color: var(--accent2); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px; }
+  .steps p { margin-bottom: 4px; }
+  .steps .highlight { color: var(--text); }
+  .steps .ok { color: var(--green); }
+  .steps .best { color: var(--gold); font-weight: 600; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+  .badge-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+  .badge svg { width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">ENADE 2021 · Sistemas de Informação</div>
+  <h1>Programação Linear<br>Solver Interativo</h1>
+  <p>Modelagem matemática e solução ótima do problema de minimização de custos de produção em duas fábricas.</p>
+</div>
+
+<div class="container">
+
+  <div class="section">
+    <div class="section-label">01 — Contexto</div>
+    <h2>O Problema</h2>
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Fábrica</th>
+            <th>Desktops/dia</th>
+            <th>Notebooks/dia</th>
+            <th>Netbooks/dia</th>
+            <th>Custo/dia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="chip chip-blue">Manaus (x)</span></td>
+            <td>8.000</td>
+            <td>1.000</td>
+            <td>2.000</td>
+            <td>R$ 150.000</td>
+          </tr>
+          <tr>
+            <td><span class="chip chip-cyan">Sul (y)</span></td>
+            <td>2.000</td>
+            <td>1.000</td>
+            <td>7.000</td>
+            <td>R$ 210.000</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="color:var(--muted);font-size:13px;">Demanda mínima</td>
+            <td><strong>≥ 16.000</strong> desktops</td>
+            <td><strong>≥ 6.000</strong> notebooks</td>
+            <td><strong>≥ 28.000</strong> netbooks</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">02 — Modelo Matemático</div>
+    <h2>Formulação em Programação Linear</h2>
+
+    <div class="model-block">
+      <div class="label">Variáveis de Decisão</div>
+      <div class="eq">
+        <span class="hl">x</span> = dias de operação da fábrica de <span class="hl">Manaus</span><br>
+        <span class="gold">y</span> = dias de operação da fábrica do <span class="gold">Sul</span>
+      </div>
+    </div>
+
+    <div class="model-block">
+      <div class="label">Função Objetivo — Minimizar custo total</div>
+      <div class="eq">
+        <span class="green">min Z</span> = 150.000<span class="hl">x</span> + 210.000<span class="gold">y</span>
+      </div>
+    </div>
+
+    <div class="model-block">
+      <div class="label">Sujeito às Restrições</div>
+      <div class="eq">
+        8.000<span class="hl">x</span> + 2.000<span class="gold">y</span> ≥ 16.000 &nbsp;→&nbsp; 4<span class="hl">x</span> + <span class="gold">y</span> ≥ 8 &nbsp;&nbsp;<span style="color:var(--muted)">// desktops</span><br>
+        1.000<span class="hl">x</span> + 1.000<span class="gold">y</span> ≥ &nbsp;6.000 &nbsp;→&nbsp; &nbsp;<span class="hl">x</span> + <span class="gold">y</span> ≥ 6 &nbsp;&nbsp;<span style="color:var(--muted)">// notebooks</span><br>
+        2.000<span class="hl">x</span> + 7.000<span class="gold">y</span> ≥ 28.000 &nbsp;→&nbsp; 2<span class="hl">x</span> + 7<span class="gold">y</span> ≥ 28 &nbsp;<span style="color:var(--muted)">// netbooks</span><br>
+        <span class="hl">x</span> ≥ 0 , &nbsp;<span class="gold">y</span> ≥ 0
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">03 — Região Viável &amp; Solução Ótima</div>
+    <h2>Visualização Gráfica</h2>
+
+    <div class="grid-2" style="align-items:start">
+      <div>
+        <div id="chart-wrap">
+          <canvas id="plCanvas"></canvas>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> 4x+y=8 (desktops)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> x+y=6 (notebooks)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div> 2x+7y=28 (netbooks)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(16,185,129,.35)"></div> Região viável</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f43f5e"></div> Vértices</div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="section-label" style="margin-bottom:8px">Vértices da região viável</div>
+          <table class="data-table" id="vertexTable">
+            <thead><tr><th>Ponto</th><th>x</th><th>y</th><th>Origem</th><th>Z = Custo</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <button id="solverBtn" onclick="solve()">▶ Calcular Solução Ótima</button>
+      </div>
+    </div>
+
+    <div id="result">
+      <hr class="divider" style="margin:24px 0">
+      <div class="section-label">Solução Ótima Encontrada</div>
+      <div class="result-grid" id="resultCards"></div>
+      <div class="steps" id="stepsBox"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+const constraints = [
+  { a:4, b:1, rhs:8,  label:'4x + y ≥ 8',   color:'#3b82f6', name:'Desktops' },
+  { a:1, b:1, rhs:6,  label:'x + y ≥ 6',    color:'#f59e0b', name:'Notebooks' },
+  { a:2, b:7, rhs:28, label:'2x + 7y ≥ 28', color:'#06b6d4', name:'Netbooks'  },
+];
+const costManaus = 150000;
+const costSul    = 210000;
+
+function lineIntersect(c1, c2) {
+  const det = c1.a * c2.b - c2.a * c1.b;
+  if (Math.abs(det) < 1e-10) return null;
+  const x = (c1.rhs * c2.b - c2.rhs * c1.b) / det;
+  const y = (c1.a * c2.rhs - c2.a * c1.rhs) / det;
+  return { x, y };
+}
+
+function isFeasible(p) {
+  for (const c of constraints) {
+    if (c.a * p.x + c.b * p.y < c.rhs - 1e-9) return false;
+  }
+  return p.x >= -1e-9 && p.y >= -1e-9;
+}
+
+function getVertices() {
+  const pts = [];
+  const n = constraints.length;
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i+1; j < n; j++) {
+      const p = lineIntersect(constraints[i], constraints[j]);
+      if (p && isFeasible(p)) pts.push({
+        ...p,
+        origin: `${constraints[i].name} ∩ ${constraints[j].name}`,
+        originColors: [constraints[i].color, constraints[j].color]
+      });
+    }
+  }
+
+  for (const c of constraints) {
+    if (c.b !== 0) {
+      const p = {x:0, y:c.rhs/c.b};
+      if (isFeasible(p)) pts.push({ ...p, origin: `${c.name} ∩ eixo y`, originColors: [c.color, '#64748b'] });
+    }
+    if (c.a !== 0) {
+      const p = {x:c.rhs/c.a, y:0};
+      if (isFeasible(p)) pts.push({ ...p, origin: `${c.name} ∩ eixo x`, originColors: [c.color, '#64748b'] });
+    }
+  }
+
+  const unique = [];
+  for (const p of pts) {
+    if (!unique.some(u => Math.abs(u.x-p.x)<1e-9 && Math.abs(u.y-p.y)<1e-9))
+      unique.push(p);
+  }
+  return unique;
+}
+
+const vertices = getVertices();
+
+function fmt(n){ return Number.isInteger(n) ? n : n.toFixed(2); }
+function fmtR(n){ return 'R$ '+Math.round(n).toLocaleString('pt-BR'); }
+
+const tbody = document.querySelector('#vertexTable tbody');
+vertices.forEach((v,i) => {
+  const Z = costManaus*v.x + costSul*v.y;
+  const dots = v.originColors.map(c =>
+    `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:3px;vertical-align:middle"></span>`
+  ).join('');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="font-family:var(--mono);font-weight:600">P${i+1}</td>
+    <td>${fmt(v.x)}</td>
+    <td>${fmt(v.y)}</td>
+    <td style="font-size:12px;color:var(--muted)">${dots}${v.origin}</td>
+    <td style="font-family:var(--mono)">${fmtR(Z)}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+const canvas = document.getElementById('plCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas(){
+  const w = canvas.parentElement.clientWidth;
+  canvas.width  = w;
+  canvas.height = w;
+  drawChart();
+}
+
+const XMAX = 10, YMAX = 10;
+
+function toCanvas(x,y){
+  const pad = 40;
+  const W = canvas.width - pad*2;
+  const H = canvas.height - pad*2;
+  return [ pad + (x/XMAX)*W, pad + H - (y/YMAX)*H ];
+}
+
+function drawChart(){
+  const W = canvas.width, H = canvas.height, pad = 40;
+  ctx.clearRect(0,0,W,H);
+
+  ctx.fillStyle = '#141929';
+  ctx.fillRect(0,0,W,H);
+
+  ctx.strokeStyle = '#253050';
+  ctx.lineWidth = 0.5;
+  for(let i=0;i<=XMAX;i++){
+    const [cx] = toCanvas(i,0); const [,cy0]=toCanvas(i,0); const [,cy1]=toCanvas(i,YMAX);
+    ctx.beginPath(); ctx.moveTo(cx,cy0); ctx.lineTo(cx,cy1); ctx.stroke();
+  }
+  for(let j=0;j<=YMAX;j++){
+    const [cx0,cy]=toCanvas(0,j); const [cx1]=toCanvas(XMAX,j);
+    ctx.beginPath(); ctx.moveTo(cx0,cy); ctx.lineTo(cx1,cy); ctx.stroke();
+  }
+
+  ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.5;
+  const [ax0,ay0]=toCanvas(0,0); const [ax1]=toCanvas(XMAX,0); const [,ay1]=toCanvas(0,YMAX);
+  ctx.beginPath(); ctx.moveTo(ax0,ay0); ctx.lineTo(ax1,ay0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ax0,ay0); ctx.lineTo(ax0,ay1); ctx.stroke();
+
+  ctx.fillStyle='#64748b'; ctx.font=`11px 'JetBrains Mono', monospace`; ctx.textAlign='center';
+  for(let i=0;i<=XMAX;i+=2){
+    const [cx,cy]=toCanvas(i,0); ctx.fillText(i,cx,cy+16);
+  }
+  ctx.textAlign='right';
+  for(let j=0;j<=YMAX;j+=2){
+    const [cx,cy]=toCanvas(0,j); ctx.fillText(j,cx-6,cy+4);
+  }
+  ctx.fillStyle='#94a3b8'; ctx.font=`bold 12px 'Space Grotesk', sans-serif`;
+  ctx.textAlign='center'; ctx.fillText('x (dias Manaus)', W/2, H-4);
+  ctx.save(); ctx.translate(14,H/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('y (dias Sul)', 0, 0); ctx.restore();
+
+  if(vertices.length > 0){
+    const cx_ = vertices.reduce((s,v)=>s+v.x,0)/vertices.length;
+    const cy_ = vertices.reduce((s,v)=>s+v.y,0)/vertices.length;
+    const sorted = [...vertices].sort((a,b)=>Math.atan2(a.y-cy_,a.x-cx_)-Math.atan2(b.y-cy_,b.x-cx_));
+    ctx.beginPath();
+    sorted.forEach((v,i)=>{
+      const [px,py]=toCanvas(v.x,v.y);
+      i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+    });
+    ctx.closePath();
+    ctx.fillStyle='rgba(16,185,129,0.18)';
+    ctx.fill();
+    ctx.strokeStyle='rgba(16,185,129,0.5)';
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+  }
+
+  constraints.forEach(c => {
+    const pts2 = [];
+    if(c.b!==0){ const y0=c.rhs/c.b; if(y0>=0&&y0<=YMAX) pts2.push([0,y0]); }
+    if(c.a!==0){ const x0=c.rhs/c.a; if(x0>=0&&x0<=XMAX) pts2.push([x0,0]); }
+    if(c.b!==0){ const y1=(c.rhs-c.a*XMAX)/c.b; if(y1>=0&&y1<=YMAX) pts2.push([XMAX,y1]); }
+    if(c.a!==0){ const x1=(c.rhs-c.b*YMAX)/c.a; if(x1>=0&&x1<=XMAX) pts2.push([x1,YMAX]); }
+    if(pts2.length<2) return;
+    const [p1x,p1y]=toCanvas(pts2[0][0],pts2[0][1]);
+    const [p2x,p2y]=toCanvas(pts2[1][0],pts2[1][1]);
+    ctx.beginPath(); ctx.moveTo(p1x,p1y); ctx.lineTo(p2x,p2y);
+    ctx.strokeStyle=c.color; ctx.lineWidth=2; ctx.setLineDash([6,4]);
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+
+  vertices.forEach((v,i)=>{
+    const [px,py]=toCanvas(v.x,v.y);
+    ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2);
+    ctx.fillStyle='#f43f5e'; ctx.fill();
+    ctx.fillStyle='#e2e8f0'; ctx.font=`bold 11px 'JetBrains Mono'`; ctx.textAlign='left';
+    ctx.fillText(`P${i+1}(${fmt(v.x)},${fmt(v.y)})`, px+8, py-6);
+  });
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function solve(){
+  let best = null;
+  vertices.forEach((v,i) => {
+    const Z = costManaus*v.x + costSul*v.y;
+    if(!best || Z < best.Z) best = { ...v, Z, idx:i };
+  });
+
+  drawChart();
+  const [px,py] = toCanvas(best.x, best.y);
+  ctx.beginPath(); ctx.arc(px,py,9,0,Math.PI*2);
+  ctx.strokeStyle='#f59e0b'; ctx.lineWidth=3; ctx.stroke();
+
+  const cards = document.getElementById('resultCards');
+  cards.innerHTML = `
+    <div class="result-card">
+      <div class="rval">${fmt(best.x)}</div>
+      <div class="rlabel">Dias — Manaus (x)</div>
+    </div>
+    <div class="result-card">
+      <div class="rval">${fmt(best.y)}</div>
+      <div class="rlabel">Dias — Sul (y)</div>
+    </div>
+    <div class="result-card gold-card">
+      <div class="rval">${fmtR(best.Z)}</div>
+      <div class="rlabel">Custo Mínimo (Z)</div>
+    </div>
+  `;
+
+  const rows = vertices.map((v,i) => {
+    const Z = costManaus*v.x + costSul*v.y;
+    const isBest = (i===best.idx);
+    return `<p class="${isBest?'best':'highlight'}">P${i+1}(${fmt(v.x)}, ${fmt(v.y)}) <span style="color:var(--muted);font-size:11px">[${v.origin}]</span> → Z = 150.000×${fmt(v.x)} + 210.000×${fmt(v.y)} = ${fmtR(Z)} ${isBest?'← MÍNIMO ✓':''}</p>`;
+  }).join('');
+
+  const checks = constraints.map(c => {
+    const val = c.a*best.x + c.b*best.y;
+    const ok = val >= c.rhs - 1e-9;
+    return `<p class="ok">✓ ${c.label} → ${fmt(val)} ≥ ${c.rhs}</p>`;
+  }).join('');
+
+  document.getElementById('stepsBox').innerHTML = `
+    <div class="step-title">Avaliação dos vértices da região viável</div>
+    ${rows}
+    <br>
+    <div class="step-title">Verificação das restrições no ponto ótimo</div>
+    ${checks}
+  `;
+
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('result').scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
+</body>
+</html>
