@@ -5,8 +5,8 @@
     --border:    #253050;
     --accent:    #3b82f6;
     --accent2:   #06b6d4;
-    --gold:      #f59e0b;
-    --green:     #10b981;
+    --gold:      gold;
+    --green:     rgb(90, 197, 2);
     --red:       #ef4444;
     --text:      white;
     --muted:     #64748b;
@@ -57,7 +57,7 @@ body {
     font-weight: 700;
     line-height: 1.1;
     letter-spacing: -.02em;
-    background: linear-gradient(135deg, #e2e8f0 30%, var(--accent2));
+    background: linear-gradient(135deg, #98EDBF 30%, var(--accent2));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
