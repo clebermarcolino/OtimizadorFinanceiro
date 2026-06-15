@@ -10,80 +10,94 @@
 <body>
 
 <div class="hero">
+  <div class="hero-eyebrow"></div>
   <h1>Otimizador Financeiro</h1>
   <p>Modelagem matemática e solução ótima do problema de minimização de custos de produção em duas fábricas.</p>
 </div>
- 
+
 <div class="container">
   <div class="section">
-    <div class="section-label">Modelo Matemático</div>
+    <div class="section-label">01 — Contexto</div>
+    <h2>O Problema</h2>
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Fábrica</th>
+            <th>Desktops / dia</th>
+            <th>Notebooks / dia</th>
+            <th>Netbooks / dia</th>
+            <th>Custo / dia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="chip chip-blue">Manaus (x)</span></td>
+            <td>8.000</td><td>1.000</td><td>2.000</td><td>R$ 150.000</td>
+          </tr>
+          <tr>
+            <td><span class="chip chip-cyan">Sul (y)</span></td>
+            <td>2.000</td><td>1.000</td><td>7.000</td><td>R$ 210.000</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:13px;">Demanda mínima</td>
+            <td><strong>≥ 16.000</strong></td>
+            <td><strong>≥ 6.000</strong></td>
+            <td><strong>≥ 28.000</strong></td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">02 — Modelo Matemático</div>
     <h2>Formulação em Programação Linear</h2>
- 
+
     <div class="model-block">
       <div class="label">Variáveis de Decisão</div>
       <div class="eq">
-        <span class="hl">x</span> = dias de operação da fábrica de <span class="hl">Manaus</span><br>
-        <span class="gold">y</span> = dias de operação da fábrica do <span class="gold">Sul</span>
+        <span class="hl">x</span> = número de dias de operação da fábrica de <span class="hl">Manaus</span><br>
+        <span class="gold">y</span> = número de dias de operação da fábrica do <span class="gold">Sul</span>
       </div>
     </div>
- 
+
     <div class="model-block">
       <div class="label">Função Objetivo — Minimizar custo total</div>
       <div class="eq">
         <span class="green">min Z</span> = 150.000<span class="hl">x</span> + 210.000<span class="gold">y</span>
       </div>
     </div>
- 
+
     <div class="model-block">
       <div class="label">Sujeito às Restrições</div>
       <div class="eq">
-        8.000<span class="hl">x</span> + 2.000<span class="gold">y</span> ≥ 16.000 &nbsp;→&nbsp; 4<span class="hl">x</span> + <span class="gold">y</span> ≥ 8 &nbsp;&nbsp;<span style="color:var(--muted)">// desktops</span><br>
-        1.000<span class="hl">x</span> + 1.000<span class="gold">y</span> ≥ &nbsp;6.000 &nbsp;→&nbsp; &nbsp;<span class="hl">x</span> + <span class="gold">y</span> ≥ 6 &nbsp;&nbsp;<span style="color:var(--muted)">// notebooks</span><br>
-        2.000<span class="hl">x</span> + 7.000<span class="gold">y</span> ≥ 28.000 &nbsp;→&nbsp; 2<span class="hl">x</span> + 7<span class="gold">y</span> ≥ 28 &nbsp;<span style="color:var(--muted)">// netbooks</span><br>
-        <span class="hl">x</span> ≥ 0 , &nbsp;<span class="gold">y</span> ≥ 0
+        8.000<span class="hl">x</span> + 2.000<span class="gold">y</span> ≥ 16.000 &nbsp;→&nbsp; 4<span class="hl">x</span> + <span class="gold">y</span> ≥ 8 &nbsp;&nbsp;<span style="color:var(--muted)">//  desktops</span><br>
+        1.000<span class="hl">x</span> + 1.000<span class="gold">y</span> ≥ &nbsp;6.000 &nbsp;→&nbsp; &nbsp;&nbsp;<span class="hl">x</span> + <span class="gold">y</span> ≥ 6 &nbsp;&nbsp;<span style="color:var(--muted)">// notebooks</span><br>
+        2.000<span class="hl">x</span> + 7.000<span class="gold">y</span> ≥ 28.000 &nbsp;→&nbsp; 2<span class="hl">x</span> + 7<span class="gold">y</span> ≥ 28 &nbsp;<span style="color:var(--muted)">// &nbsp;netbooks</span><br>
+        <span class="hl">x</span> ≥ 0 ,&nbsp; <span class="gold">y</span> ≥ 0
       </div>
     </div>
   </div>
- 
+
   <div class="section">
-    <div class="section-label">Região Viável &amp; Solução Ótima</div>
-    <h2>Visualização Gráfica</h2>
- 
-    <div class="grid-2" style="align-items:start">
-      <div>
-        <div id="chart-wrap">
-          <canvas id="plCanvas"></canvas>
-        </div>
-        <div class="legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> 4x+y=8 (desktops)</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> x+y=6 (notebooks)</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--accent2)"></div> 2x+7y=28 (netbooks)</div>
-          <div class="legend-item"><div class="legend-dot" style="background:rgba(16,185,129,.35)"></div> Região viável</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#f43f5e"></div> Vértices</div>
-        </div>
-      </div>
-      <div>
-        <div class="card">
-          <div class="section-label" style="margin-bottom:8px">Vértices da região viável</div>
-          <table class="data-table" id="vertexTable">
-            <thead><tr><th>Ponto</th><th>x</th><th>y</th><th>Origem</th><th>Z = Custo</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <button id="solverBtn">Calcular Solução Ótima</button>
-      </div>
-    </div>
- 
+    <div class="section-label">03 — Solução</div>
+    <h2>Calcular Solução Ótima</h2>
+
+    <button id="solverBtn">▶ Calcular Solução Ótima</button>
+
     <div id="result">
-      <hr class="divider" style="margin:24px 0">
+      <hr class="divider">
       <div class="section-label">Solução Ótima Encontrada</div>
+
       <div class="result-grid" id="resultCards"></div>
       <div class="steps" id="stepsBox"></div>
     </div>
   </div>
- 
+
 </div>
- 
+
 <script src="index.js"></script>
 </body>
 </html>
