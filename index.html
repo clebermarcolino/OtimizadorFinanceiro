@@ -9,53 +9,123 @@
 <link rel="shortcut icon" href="./assets/favicon.png" type="image/x-icon">
 </head>
 <body>
-
 <div class="hero">
-  <div class="hero-eyebrow"></div>
   <h1>Otimizador Financeiro</h1>
-  <p>Modelagem matemática e solução ótima do problema de minimização de custos de produção em duas fábricas.</p>
+  <p>Edite os parâmetros das fábricas e da demanda, depois calcule a solução ótima.</p>
 </div>
-
+ 
 <div class="container">
   <div class="section">
-    <div class="section-label">01 — Contexto</div>
-    <h2>O Problema</h2>
-    <div class="card">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Fábrica</th>
-            <th>Desktops / dia</th>
-            <th>Notebooks / dia</th>
-            <th>Netbooks / dia</th>
-            <th>Custo / dia</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="chip chip-blue">Manaus (x)</span></td>
-            <td>8.000</td><td>1.000</td><td>2.000</td><td>R$ 150.000</td>
-          </tr>
-          <tr>
-            <td><span class="chip chip-cyan">Sul (y)</span></td>
-            <td>2.000</td><td>1.000</td><td>7.000</td><td>R$ 210.000</td>
-          </tr>
-          <tr>
-            <td style="color:var(--muted);font-size:13px;">Demanda mínima</td>
-            <td><strong>≥ 16.000</strong></td>
-            <td><strong>≥ 6.000</strong></td>
-            <td><strong>≥ 28.000</strong></td>
-            <td>—</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="section-header">
+      <div>
+        <div class="section-label">01 — Dados do Problema</div>
+        <h2>Ajuste os valores ou use os padrões</h2>
+      </div>
+      <button class="btn-restore" id="btnRestore">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
+        </svg>
+        Limpar
+      </button>
+    </div>
+ 
+    <div class="input-grid">
+      <div class="input-card manaus">
+        <div class="card-header">
+          <div class="card-icon">🏭</div>
+          <div>
+            <div class="card-title">Fábrica de Manaus</div>
+            <div class="card-sub">Região Norte</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="field-label">Produção Diária</div>
+          <div class="input-row">
+            <div class="input-row-label">Desktops</div>
+            <input class="num-input" id="mDesktop" type="number" min="0" value="8000">
+          </div>
+          <div class="input-row">
+            <div class="input-row-label">Notebooks</div>
+            <input class="num-input" id="mNotebook" type="number" min="0" value="1000">
+          </div>
+          <div class="input-row">
+            <div class="input-row-label">Netbooks</div>
+            <input class="num-input" id="mNetbook" type="number" min="0" value="2000">
+          </div>
+          <div class="input-row">
+            <div class="input-row-label">Custo/dia</div>
+            <div class="input-with-prefix">
+              <span class="prefix">R$</span>
+              <input id="mCusto" type="number" min="0" value="150000">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="input-card sul">
+        <div class="card-header">
+          <div class="card-icon">🏭</div>
+          <div>
+            <div class="card-title">Fábrica da Região Sul</div>
+            <div class="card-sub">Região Sul</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="field-label">Produção Diária</div>
+          <div class="input-row">
+            <div class="input-row-label">Desktops</div>
+            <input class="num-input" id="sDesktop" type="number" min="0" value="2000">
+          </div>
+          <div class="input-row">
+            <div class="input-row-label">Notebooks</div>
+            <input class="num-input" id="sNotebook" type="number" min="0" value="1000">
+          </div>
+          <div class="input-row">
+            <div class="input-row-label">Netbooks</div>
+            <input class="num-input" id="sNetbook" type="number" min="0" value="7000">
+          </div>
+          <div class="input-row">
+            <div class="input-row-label">Custo/dia</div>
+            <div class="input-with-prefix">
+              <span class="prefix">R$</span>
+              <input id="sCusto" type="number" min="0" value="210000">
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="input-card demanda">
+        <div class="card-header">
+          <div class="card-icon">📦</div>
+          <div>
+            <div class="card-title">Demanda do Pedido</div>
+            <div class="card-sub">Quantidade Mínima</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="field-label">Mínimo a Entregar</div>
+          <div class="input-row">
+            <div class="input-row-label">Desktops</div>
+            <input class="num-input" id="dDesktop" type="number" min="0" value="16000">
+          </div>
+          <div class="input-row">
+            <div class="input-row-label">Notebooks</div>
+            <input class="num-input" id="dNotebook" type="number" min="0" value="6000">
+          </div>
+          <div class="input-row">
+            <div class="input-row-label">Netbooks</div>
+            <input class="num-input" id="dNetbook" type="number" min="0" value="28000">
+          </div>
+        </div>
+      </div>
+ 
     </div>
   </div>
-
+ 
   <div class="section">
     <div class="section-label">02 — Modelo Matemático</div>
     <h2>Formulação em Programação Linear</h2>
-
+ 
     <div class="model-block">
       <div class="label">Variáveis de Decisão</div>
       <div class="eq">
@@ -63,17 +133,17 @@
         <span class="gold">y</span> = número de dias de operação da fábrica do <span class="gold">Sul</span>
       </div>
     </div>
-
+ 
     <div class="model-block">
       <div class="label">Função Objetivo — Minimizar custo total</div>
-      <div class="eq">
+      <div class="eq" id="modelObj">
         <span class="green">min Z</span> = 150.000<span class="hl">x</span> + 210.000<span class="gold">y</span>
       </div>
     </div>
-
+ 
     <div class="model-block">
       <div class="label">Sujeito às Restrições</div>
-      <div class="eq">
+      <div class="eq" id="modelRestr">
         8.000<span class="hl">x</span> + 2.000<span class="gold">y</span> ≥ 16.000 &nbsp;→&nbsp; 4<span class="hl">x</span> + <span class="gold">y</span> ≥ 8 &nbsp;&nbsp;<span style="color:var(--muted)">//  desktops</span><br>
         1.000<span class="hl">x</span> + 1.000<span class="gold">y</span> ≥ &nbsp;6.000 &nbsp;→&nbsp; &nbsp;&nbsp;<span class="hl">x</span> + <span class="gold">y</span> ≥ 6 &nbsp;&nbsp;<span style="color:var(--muted)">// notebooks</span><br>
         2.000<span class="hl">x</span> + 7.000<span class="gold">y</span> ≥ 28.000 &nbsp;→&nbsp; 2<span class="hl">x</span> + 7<span class="gold">y</span> ≥ 28 &nbsp;<span style="color:var(--muted)">// &nbsp;netbooks</span><br>
@@ -81,24 +151,24 @@
       </div>
     </div>
   </div>
-
+ 
   <div class="section">
     <div class="section-label">03 — Solução</div>
     <h2>Calcular Solução Ótima</h2>
-
-    <button id="solverBtn">▶ Calcular Solução Ótima</button>
-
+ 
+    <button id="solverBtn">Calcular Solução Ótima</button>
+    <div class="alert" id="alertBox"></div>
+ 
     <div id="result">
       <hr class="divider">
       <div class="section-label">Solução Ótima Encontrada</div>
-
       <div class="result-grid" id="resultCards"></div>
       <div class="steps" id="stepsBox"></div>
     </div>
   </div>
-
+ 
 </div>
-
+ 
 <script src="index.js"></script>
 </body>
 </html>
